@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
+    // Further reading:
+    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
+    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+    url      = env("DATABASE_URL")
+}
+
+model BCPTournamentEvent {
+    id                     Int       @id @default(autoincrement())
+    eventId                String    @unique @db.VarChar(255)
+    active                 Boolean?
+    checkedInPlayers       Int       @default(0)
+    country                String
+    droppedPlayers         Int       @default(0)
+    ended                  Boolean?
+    eventDate              DateTime?
+    eventEndDate           DateTime?
+    formatted_address      String    @default("N/A")
+    gameSystemManufacturer String
+    gameSystemName         String
+    gameType               Int?
+    isOnlineEvent          Boolean?
+    locationName           String
+    name                   String
+    notCheckedInPlayers    Int       @default(0)
+    numTickets             Int       @default(0)
+    numberOfRounds         Int       @default(0)
+    placingMetrics         Json
+    pointsValue            Int       @default(0)
+    queryNumPlayers        Int       @default(0)
+    started                Boolean?
+    state                  String    @default("N/A")
+    teamEvent              Boolean?
+    ticketPrice            Int       @default(0)
+    timeZone               String
+    totalPlayers           Int       @default(0)
+    url                    String?
+    BCPCreatedAt           DateTime  @default(now())
+    BCPUpdatedAt           DateTime  @updatedAt
+    gameSystemId           String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([eventId])
+    @@index([name])
+}
+
+model Post {
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+
+    @@index([name])
+}
+
+// Necessary for Next auth
+model Account {
+    id                       String  @id @default(cuid())
+    userId                   String
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String? // @db.Text
+    access_token             String? // @db.Text
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String? // @db.Text
+    session_state            String?
+    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refresh_token_expires_in Int?
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    posts         Post[]
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}

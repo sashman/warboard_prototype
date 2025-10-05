@@ -1,6 +1,7 @@
 import { postRouter } from "~/server/api/routers/post";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { tournamentEventRouter } from "./routers/tournamet-event";
+import { pairingMatrixRouter } from "./routers/pairing-matrix";
 
 /**
  * This is the primary router for your server.
@@ -10,6 +11,7 @@ import { tournamentEventRouter } from "./routers/tournamet-event";
 export const appRouter = createTRPCRouter({
   post: postRouter,
   tournamentEvent: tournamentEventRouter,
+  pairingMatrix: pairingMatrixRouter,
 });
 
 // export type definition of API
